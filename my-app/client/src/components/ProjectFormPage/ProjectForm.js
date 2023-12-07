@@ -12,13 +12,31 @@ function ProjectForm() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData.projectName);
-  }
+    const jsonFormData = JSON.stringify(formData);
+
+    try {
+      const response = await fetch('http://localhost:3001/submit-form', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonFormData,
+      });
+  
+      if (response.ok) {
+        console.log('Data submitted successfully');
+      } else {
+        console.error('Failed to submit data');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
 
   return (
-    <form>
+    <form onSubmit={handleSubmit}>
       <label>
         Project Name:
         <input

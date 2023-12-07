@@ -1,0 +1,26 @@
+[
+  {
+    "projectName": "project2",
+    "projectDescription": "this is so uncool",
+    "contacts": [],
+    "projectUrl": "www.youtube.com",
+    "projectTopics": [],
+    "licenses": []
+  },
+  {
+    "projectName": "project2",
+    "projectDescription": "this is so uncool",
+    "contacts": [],
+    "projectUrl": "asd",
+    "projectTopics": [],
+    "licenses": []
+  },
+  {
+    "projectName": "ospo_project",
+    "projectDescription": "THE BEST",
+    "contacts": [],
+    "projectUrl": "url",
+    "projectTopics": [],
+    "licenses": []
+  }
+]
