@@ -1,8 +1,14 @@
 import { useState } from "react";
+import isUrl from "is-url";
 
 function ProjectForm() {
   const [formData, setFormData] = useState(
-    { projectName: '', projectDescription: '', contacts: [], projectUrl: '', projectTopics: [], licenses: []})
+    { projectName: '', projectDescription: '', email: '', projectUrl: '', projectTopics: [], licenses: []})
+  
+  const [urlError, setUrlError] = useState('');
+  const [emailError, setEmailError] = useState('');
+
+  const [successMessage, setSuccessMessage] = useState('');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -16,7 +22,38 @@ function ProjectForm() {
     e.preventDefault();
     const jsonFormData = JSON.stringify(formData);
 
-    try {
+    let isValid = true;
+
+    if (!formData.projectUrl) {
+      setUrlError("Please enter a project URL");
+    } else {
+      const projectUrlCheck = isUrl(formData.projectUrl);
+
+      if (!projectUrlCheck) {
+        setUrlError("Project URL is not in a valid format");
+        isValid = false;
+      } else {
+        setUrlError("");
+      }
+    }
+    
+    
+    if (!formData.email) {
+      setEmailError("Please enter the primary contact's email");
+    } else {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const emailCheck = emailRegex.test(formData.email);
+    
+      if (!emailCheck) {
+        setEmailError("Contact email is not a valid email");
+        isValid = false;
+      } else {
+        setEmailError("");
+      }
+    }
+    
+
+    if (isValid) {
       const response = await fetch('http://localhost:3001/submit-form', {
         method: 'POST',
         headers: {
@@ -24,48 +61,65 @@ function ProjectForm() {
         },
         body: jsonFormData,
       });
-  
+
       if (response.ok) {
-        console.log('Data submitted successfully');
+        setSuccessMessage("Project submitted successfully!");
       } else {
-        console.error('Failed to submit data');
+        setSuccessMessage("Something went wrong...please try again.");
       }
-    } catch (error) {
-      console.error('Error:', error);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <label>
-        Project Name:
-        <input
-          type="text"
-          name="projectName"
-          value={formData.projectName}
-          onChange={handleChange}
-        />
-      </label>
-      <label>
-        Project Description:
-        <input
-          type="text"
-          name="projectDescription"
-          value={formData.projectDescription}
-          onChange={handleChange}
-        />
-      </label>
-      <label>
-        Project URL:
-        <input
-          type="text"
-          name="projectUrl"
-          value={formData.projectUrl}
-          onChange={handleChange}
-        />
-      </label>
-      <button type="submit">Submit</button>
-    </form>
+    <div>
+      <form onSubmit={handleSubmit}>
+        <label>
+          Project Name:
+          <input
+            type="text"
+            name="projectName"
+            value={formData.projectName}
+            onChange={handleChange}
+          />
+        </label>
+
+        <label>
+          Project Description:
+          <input
+            type="text"
+            name="projectDescription"
+            value={formData.projectDescription}
+            onChange={handleChange}
+          />
+        </label>
+
+        <label>
+          Email:
+          <input
+            type="text"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+          />
+        </label>
+        {emailError && <div className="urlError" style={{color: 'red'}}> {emailError} </div>}
+
+        <label>
+          Project URL:
+          <input
+            type="text"
+            name="projectUrl"
+            value={formData.projectUrl}
+            onChange={handleChange}
+          />
+        </label>
+        {urlError && <div className="urlError" style={{color: 'red'}}> {urlError} </div>}
+
+        <button type="submit">Submit</button>
+      </form>
+
+      {successMessage && <p> {successMessage} </p>}
+    </div>
   );
 }
 
