@@ -1,6 +1,7 @@
 import { useState } from "react";
 import isUrl from "is-url";
 import Select from 'react-select';
+import './ProjectForm.css';
 
 function ProjectForm() {
   const [formData, setFormData] = useState({
