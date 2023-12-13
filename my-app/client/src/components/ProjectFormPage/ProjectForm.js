@@ -131,71 +131,132 @@ function ProjectForm() {
     }
   };
 
+  // Name     URL
+
+  //    Abstract
+
+  // Project Areas
+
+  // Project Licenses
+
+  // Primary Contacts
+  //    Name Email
+
+  // Guidelines URL
+
   return (
-    <div className="form-container">
+    <div className="project-form-page">
       <h1>Open Source Project Information Form</h1>
 
-      <form onSubmit={handleSubmit}>
-        <label>
-          Project Name:
-          <input
-            type="text"
-            name="projectName"
-            value={formData.projectName}
-            onChange={handleChange}
-            placeholder="Enter the project's name"
-          />
-        </label>
-        {errors.projectName && <div className="error">{errors.projectName}</div>}
+      <div className="form-container">
 
-        <label>
-          Project Abstract:
+        <div className="form-field">
+          <div className="sub-field">
+            <div className="field-title">Project Name</div>
+            {errors.projectName && <div className="error">{errors.projectName}</div>}
+
+            <input
+              className="input-field"
+              type="text"
+              name="projectName"
+              value={formData.projectName}
+              onChange={handleChange}
+              placeholder="Enter the project's name"
+            />
+          </div>
+          
+          <div className="sub-field">
+            <div className="field-title">Project URL</div>
+            {errors.projectUrl && <div className="error">{errors.projectUrl}</div>}
+
+            <input
+              className="input-field"
+              type="text"
+              name="projectUrl"
+              value={formData.projectUrl}
+              onChange={handleChange}
+              placeholder="Enter a valid URL to the project page"
+            />
+          </div>
+        </div>
+
+
+        <div className="form-field">
+          <div className="field-title">Project Abstract</div>
+          {errors.projectAbstract && <div className="error">{errors.projectAbstract}</div>}
+
           <input
+            className="input-field"
             type="text"
             name="projectAbstract"
             value={formData.projectAbstract}
             onChange={handleChange}
             placeholder="Enter an abstract on the project"
           />
-        </label>
-        {errors.projectAbstract && <div className="error">{errors.projectAbstract}</div>}
+        </div>
 
-        <label>
-          Project URL:
-          <input
-            type="text"
-            name="projectUrl"
-            value={formData.projectUrl}
-            onChange={handleChange}
-            placeholder="Enter a valid URL to the project page"
+
+        <div className="form-field">
+          <div className="field-title">Project Areas</div>
+          {errors.projectAreas && <div className="error">{errors.projectAreas}</div>}
+
+          <Select 
+            className="select-container"
+            isMulti
+            name="projectAreas"
+            options={projectAreaOptions}
+            classNamePrefix="select"
+            onChange={(selectedOptions) => handleSelectChange('projectAreas', selectedOptions)} 
           />
-        </label>
-        {errors.projectUrl && <div className="error">{errors.projectUrl}</div>}
+        </div>
 
 
-        <div className="contacts-section">
-          <label>
-            Primary Contact(s)
-          </label>
+        <div className="form-field">
+          <div className="field-title">Project License(s)</div>
+          {errors.licenses && <div className="error">{errors.licenses}</div>}
+
+          <Select
+            className="select-container"
+            isMulti
+            name="licenses"
+            options={licenseOptions}
+            classNamePrefix="select"
+            onChange={(selectedOptions) => handleSelectChange('licenses', selectedOptions)} 
+          />
+        </div>
+
+
+        <div className="form-field">
+          <div className="field-title">Primary Contact(s)</div>
+
           {formData.contacts.map((contact, index) => (
             <div key={index} className="contact-input">
-              <input
-                type="text" 
-                name="name" 
-                value={contact.name} 
-                onChange={(e) => handleContactChange(index, e)} 
-                placeholder="Enter the contact's name"
-              />
-              {errors.contacts && errors.contacts[index] && errors.contacts[index].name && <div className="error">{errors.contacts[index].name}</div>}
-
-              <input
-                type="text" 
-                name="email" 
-                value={contact.email} 
-                onChange={(e) => handleContactChange(index, e)} 
-                placeholder="Enter the contact's email"
-              />
-              {errors.contacts && errors.contacts[index] && errors.contacts[index].email && <div className="error">{errors.contacts[index].email}</div>}
+              
+              <div className="sub-field">
+                {errors.contacts && errors.contacts[index] && errors.contacts[index].name && <div className="error">{errors.contacts[index].name}</div>}
+                
+                <input
+                  className="input-field"
+                  type="text" 
+                  name="name" 
+                  value={contact.name} 
+                  onChange={(e) => handleContactChange(index, e)} 
+                  placeholder="Enter the contact's name"
+                />
+              </div>
+              
+              <div className="sub-field">
+                {errors.contacts && errors.contacts[index] && errors.contacts[index].email && <div className="error">{errors.contacts[index].email}</div>}
+                
+                <input
+                  className="input-field"
+                  type="text" 
+                  name="email" 
+                  value={contact.email} 
+                  onChange={(e) => handleContactChange(index, e)} 
+                  placeholder="Enter the contact's email"
+                />
+              </div>
               
               {index > 0 && (
                 <button type="button" onClick={() => removeContact(index)}>
@@ -211,49 +272,26 @@ function ProjectForm() {
             </button>
           )}
         </div>
-        
-        <label>
-          Project Areas
-        </label>
-        <Select
-          isMulti
-          name="projectAreas"
-          options={projectAreaOptions}
-          className="select-container"
-          classNamePrefix="select"
-          onChange={(selectedOptions) => handleSelectChange('projectAreas', selectedOptions)} 
-        />
-        {errors.projectAreas && <div className="error">{errors.projectAreas}</div>}
 
-        <label>
-          Project License(s)
-        </label>
-        <Select
-          isMulti
-          name="licenses"
-          options={licenseOptions}
-          className="select-container"
-          classNamePrefix="select"
-          onChange={(selectedOptions) => handleSelectChange('licenses', selectedOptions)} 
-        />
-        {errors.licenses && <div className="error">{errors.licenses}</div>}
 
-        <label>
-          Community Contribution Guidelines URL:
+        <div className="form-field">
+          <div className="field-title">Community Contribution Guidelines URL</div>
+          {errors.guidelinesUrl && <div className="error">{errors.guidelinesUrl}</div>}
+
           <input
+            className="input-field"
             type="text"
             name="guidelinesUrl"
             value={formData.guidelinesUrl}
             onChange={handleChange}
             placeholder="Enter a valid URL to the community contribution guidelines"
           />
-        </label>
-        {errors.guidelinesUrl && <div className="error">{errors.guidelinesUrl}</div>}
-        
-        <button type="submit">Submit</button>
+        </div>
 
+
+        <button type="submit" onClick={handleSubmit}>Submit</button>
         {successMessage && <p> {successMessage} </p>}
-      </form>
+      </div>
     </div>
   );
 }

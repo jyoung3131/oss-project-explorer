@@ -1,41 +1,19 @@
 [
   {
-    "projectName": "hello",
-    "projectDescription": "this is a project",
+    "projectName": "123",
+    "projectAbstract": "123",
     "projectUrl": "https://www.youtube.com",
     "contacts": [
       {
-        "name": "Nate Kim",
-        "email": "test@gmail.com"
-      },
-      {
-        "name": "Thomas Smith",
-        "email": "test2@yahoo.com"
+        "name": "Nate",
+        "email": "tesst1@gmail.com"
       }
     ],
     "projectAreas": [
-      "ai"
+      "bioscience"
     ],
     "licenses": [
-      "mit"
-    ],
-    "guidelinesUrl": "https://www.google.com"
-  },
-  {
-    "projectName": "asd",
-    "projectAbstract": "asd",
-    "projectUrl": "https://www.youtube.com",
-    "contacts": [
-      {
-        "name": "asd",
-        "email": "test@gmail.com"
-      }
-    ],
-    "projectAreas": [
-      "ai"
-    ],
-    "licenses": [
-      "mit"
+      "apache"
     ],
     "guidelinesUrl": "https://www.google.com"
   }
