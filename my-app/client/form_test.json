@@ -1,19 +1,23 @@
 [
   {
-    "projectName": "123",
-    "projectAbstract": "123",
+    "projectName": "Project 1",
+    "projectAbstract": "This is a project",
     "projectUrl": "https://www.youtube.com",
     "contacts": [
       {
-        "name": "Nate",
-        "email": "tesst1@gmail.com"
+        "name": "Nate Kim",
+        "email": "test@gmail.com"
       }
     ],
     "projectAreas": [
-      "bioscience"
+      "ai",
+      "graphics",
+      "hpc"
     ],
     "licenses": [
-      "apache"
+      "mit",
+      "isc",
+      "bsd-3"
     ],
     "guidelinesUrl": "https://www.google.com"
   }
