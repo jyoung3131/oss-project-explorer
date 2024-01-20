@@ -1,6 +1,7 @@
 import { useState } from "react";
 import isUrl from "is-url";
 import Select from 'react-select';
+import { Octokit } from "octokit";
 
 function ProjectForm() {
   const [formData, setFormData] = useState({
@@ -112,15 +113,42 @@ function ProjectForm() {
     const isFormValid = validateAllFields();
     
     if (isFormValid) {
-      const response = await fetch('http://localhost:3001/submit-form', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: jsonFormData,
-      });
+      const octokit = new Octokit({
+        auth: "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"
+      })
 
-      if (response.ok) {
+      // Get File SHA and contents
+      const response1 = await octokit.request("GET /repos/{owner}/{repo}/contents/{path}?ref=json-form-test", {
+        owner: "gt-ospo",
+        repo: "open-source-project-explorer",
+        path: "project_list.json"
+      })
+      console.log(response1.data)
+      let sha = response1.data["sha"]
+
+      // Turn new file contents to base 64 encoding
+
+
+      // Update file in repo
+
+      const response2 = await octokit.request("PUT /repos/{owner}/{repo}/contents/{path}", {
+        owner: "gt-ospo",
+        repo: "open-source-project-explorer",
+        path: "project_list.json",
+        message: "Inserted new project to list JSON file",
+        content: "",
+        sha: sha
+      })
+
+      // const response = await fetch('http://localhost:3001/submit-form', {
+      //   method: 'POST',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //   },
+      //   body: jsonFormData,
+      // });
+
+      if (response1.ok) {
         setSuccessMessage("Project submitted successfully!");
       } else {
         setSuccessMessage("Something went wrong...please try again.");
