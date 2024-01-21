@@ -7,6 +7,7 @@ module.exports = {
     extend: {
       colors: {
         "gtgold": "#a4925a",
+        "gtgoldlight": "#bfb37c",
         "gtblack": "#262626",
       }
     },

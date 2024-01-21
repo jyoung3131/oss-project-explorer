@@ -20,5 +20,23 @@
       "bsd-3"
     ],
     "guidelinesUrl": "https://www.google.com"
+  },
+  {
+    "projectName": "project1",
+    "projectAbstract": "project1",
+    "projectUrl": "https://www.youtube.com",
+    "contacts": [
+      {
+        "name": "Fakename",
+        "email": "fakeemail@gmail.com"
+      }
+    ],
+    "projectAreas": [
+      "robotics"
+    ],
+    "licenses": [
+      "isc"
+    ],
+    "guidelinesUrl": "https://www.google.com"
   }
 ]

@@ -7,10 +7,10 @@ function ProjectForm() {
   const [formData, setFormData] = useState({
     projectName: '',
     projectAbstract: '',
-    projectUrl: '',
-    contacts: [{ name: '', email: '' }],
     projectAreas: [],
     licenses: [],
+    contacts: [{ name: '', email: '' }],
+    projectUrl: '',
     guidelinesUrl: ''
   });
   
@@ -32,6 +32,7 @@ function ProjectForm() {
 
   const [errors, setErrors] = useState({});
 
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [successMessage, setSuccessMessage] = useState('');
 
   const handleChange = (e) => {
@@ -108,11 +109,12 @@ function ProjectForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const jsonFormData = JSON.stringify(formData);
     const isFormValid = validateAllFields();
     
-    if (isFormValid) {
+    if (isFormValid && !isSubmitting) {
+      setSuccessMessage("Loading please wait...")
+      setIsSubmitting(true)
+
       const octokit = new Octokit({
         auth: "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"
       })
@@ -123,35 +125,49 @@ function ProjectForm() {
         repo: "open-source-project-explorer",
         path: "project_list.json"
       })
-      console.log(response1.data)
-      let sha = response1.data["sha"]
+
+      let sha = null
+      var fileContent = []
+
+      if (response1.status === 200) {
+        sha = response1.data["sha"]
+        fileContent = JSON.parse(atob(response1.data.content))
+      }
 
       // Turn new file contents to base 64 encoding
+      fileContent.push(formData)
+      fileContent = JSON.stringify(fileContent, null, 2)
+      fileContent = btoa(fileContent)
 
+      // Update or create new file in repo
+      try {
+        if (response1.status === 200) {
+          await octokit.request("PUT /repos/{owner}/{repo}/contents/{path}", {
+            owner: "gt-ospo",
+            repo: "open-source-project-explorer",
+            path: "project_list.json",
+            message: "Inserted new project to project list file",
+            content: fileContent,
+            sha: sha,
+            branch: "json-form-test"
+          })
+        } else {
+          await octokit.request("PUT /repos/{owner}/{repo}/contents/{path}", {
+            owner: "gt-ospo",
+            repo: "open-source-project-explorer",
+            path: "project_list.json",
+            message: "Created project list file and added new project",
+            content: fileContent,
+            branch: "json-form-test"
+          })
+        }
 
-      // Update file in repo
-
-      const response2 = await octokit.request("PUT /repos/{owner}/{repo}/contents/{path}", {
-        owner: "gt-ospo",
-        repo: "open-source-project-explorer",
-        path: "project_list.json",
-        message: "Inserted new project to list JSON file",
-        content: "",
-        sha: sha
-      })
-
-      // const response = await fetch('http://localhost:3001/submit-form', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: jsonFormData,
-      // });
-
-      if (response1.ok) {
         setSuccessMessage("Project submitted successfully!");
-      } else {
+      } catch (error) {
+        console.log(error)
         setSuccessMessage("Something went wrong...please try again.");
+      } finally {
+        setIsSubmitting(false)
       }
     } else {
       setSuccessMessage("");
@@ -358,7 +374,10 @@ function ProjectForm() {
           <button
             type="submit"
             onClick={handleSubmit}
-            className="block w-full rounded-md bg-gtgold px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            disabled={isSubmitting}
+            className={`block w-full rounded-md px-3.5 py-2.5 text-center text-sm font-semibold shadow-sm ${
+              isSubmitting ? 'bg-gray-400 text-gray-200' : 'bg-gtgold text-white hover:bg-gtgoldlight'
+            } focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600`}
           >
             Submit
           </button>
