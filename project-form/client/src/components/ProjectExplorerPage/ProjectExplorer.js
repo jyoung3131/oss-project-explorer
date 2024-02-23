@@ -1,5 +1,6 @@
 import ProjectForm from "../ProjectFormPage/ProjectForm";
-import { useState, useEffect } from "react";
+import { useMemo, useState, useEffect } from "react";
+import { useReactTable, createColumnHelper, getCoreRowModel, flexRender } from '@tanstack/react-table';
 import { Octokit } from "octokit";
 
 // TODO:
@@ -7,14 +8,24 @@ import { Octokit } from "octokit";
 //  - Add styling
 //  - Move Github API method to separate file
 
+const columnHelper = createColumnHelper();
+const columns = [
+    columnHelper.accessor("projectName", {
+        header: "Name",
+        cell: info => info.getValue(),
+    }),
+    columnHelper.accessor(row => row.projectAreas.join(", "), {
+        id: "projectAreas",
+        header: () => "Project Areas",
+    }),
+    columnHelper.accessor(row => row.licenses.join(", "), {
+        id: "licenses",
+        header: () => "Licenses",
+    }),
+];
+
 function ProjectExplorer() {
-    const [formData, setFormData] = useState({
-        searchedName: '',
-        projectAreas: [],
-        licenses: [],
-        displayedProjects: [],
-        allProjects: []
-    });
+    const [projects, setProjects] = useState([]);
 
     const projectAreaOptions = [
         { value: 'ai', label: 'Artifical Intelligence' },
@@ -33,19 +44,6 @@ function ProjectExplorer() {
     ];
 
     const [showForm, setShowForm] = useState(false);
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prevState => ({
-            ...prevState,
-            [name]: value
-        }));
-    };
-
-    const handleSelectChange = (name, selectedOptions) => {
-        const values = selectedOptions.map(option => option.value);
-        setFormData({ ...formData, [name]: values });
-    };
 
 
     // Fetch JSON project data and set allProjects
@@ -66,10 +64,8 @@ function ProjectExplorer() {
                 const content = atob(response.data.content)
                 const projects = JSON.parse(content)
 
-                setFormData(prevState => ({
-                    ...prevState,
-                    allProjects: projects
-                }));
+                setProjects(projects);
+
             } catch (error) {
                 console.error("Something went wrong while fetching the projects...", error);
             }
@@ -78,27 +74,42 @@ function ProjectExplorer() {
         fetchProjects();
     }, []);
 
-    // Detect changes in search bar or category checkboxes and filter projects
-    useEffect(() => {
-        const filterProjects = () => {
-          return formData.allProjects.filter(project => {
-            const matchesName = project.name.toLowerCase().includes(formData.searchedName.toLowerCase());
-            const matchesDisciplines = formData.projectAreas.length === 0 || project.disciplines.some(discipline => formData.projectAreas.includes(discipline));
-            const matchesLicenses = formData.licenses.length === 0 || project.licenses.some(license => formData.licenses.includes(license));
-      
-            return matchesName && matchesDisciplines && matchesLicenses;
-          });
-        };
-      
-        setFormData(prevState => ({
-          ...prevState,
-          displayedProjects: filterProjects()
-        }));
-      }, [formData.searchedName, formData.projectAreas, formData.licenses]);
+    const data = useMemo(() => projects, [projects]);
+
+    const table = useReactTable({
+        data,
+        columns,
+        getCoreRowModel: getCoreRowModel(),
+    });
     
 
     return (
         <div className="isolate bg-white px-6 py-24 sm:py-32 lg:px-8">
+            <table>
+                <thead>
+                    {table.getHeaderGroups().map(headerGroup => (
+                        <tr key={headerGroup.id}>
+                        {headerGroup.headers.map(header => (
+                            <th key={header.id}>
+                                {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                            </th>
+                        ))}
+                        </tr>
+                    ))}
+                </thead>
+                <tbody>
+                    {table.getRowModel().rows.map(row => (
+                        <tr key={row.id}>
+                            {row.getVisibleCells().map(cell => (
+                                <td key={cell.id}>
+                                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                </td>
+                            ))}
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+            
             <div className="mt-10">
                 <button 
                     onClick={() => setShowForm(!showForm)}
