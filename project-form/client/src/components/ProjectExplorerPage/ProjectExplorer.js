@@ -1,6 +1,7 @@
-import ProjectForm from "../ProjectFormPage/ProjectForm";
+import React from "react";
 import { useMemo, useState, useEffect } from "react";
-import { useReactTable, createColumnHelper, getCoreRowModel, flexRender } from '@tanstack/react-table';
+import ProjectForm from "../ProjectFormPage/ProjectForm";
+import { useReactTable, createColumnHelper, getCoreRowModel, getPaginationRowModel, getExpandedRowModel, flexRender } from '@tanstack/react-table';
 import { Octokit } from "octokit";
 
 // TODO:
@@ -12,7 +13,14 @@ const columnHelper = createColumnHelper();
 const columns = [
     columnHelper.accessor("projectName", {
         header: "Name",
-        cell: info => info.getValue(),
+        cell: info => (
+            <>
+                <button onClick={() => info.row.toggleExpanded()}>
+                    {info.row.getIsExpanded() ? '👇' : '👉'}
+                </button>
+                {info.getValue()}
+            </>
+        ),
     }),
     columnHelper.accessor(row => row.projectAreas.join(", "), {
         id: "projectAreas",
@@ -25,8 +33,6 @@ const columns = [
 ];
 
 function ProjectExplorer() {
-    const [projects, setProjects] = useState([]);
-
     const projectAreaOptions = [
         { value: 'ai', label: 'Artifical Intelligence' },
         { value: 'bioscience', label: 'Bioscience' },
@@ -44,7 +50,12 @@ function ProjectExplorer() {
     ];
 
     const [showForm, setShowForm] = useState(false);
-
+    const [projects, setProjects] = useState([]);
+    const [expanded, setExpanded] = useState({});
+    const [pagination, setPagination] = useState({
+        pageIndex: 0,
+        pageSize: 10
+    });
 
     // Fetch JSON project data and set allProjects
     useEffect(() => {
@@ -75,41 +86,114 @@ function ProjectExplorer() {
     }, []);
 
     const data = useMemo(() => projects, [projects]);
-
     const table = useReactTable({
         data,
         columns,
+        state: {
+            expanded,
+            pagination,
+        },
+        onExpandedChange: setExpanded,
         getCoreRowModel: getCoreRowModel(),
+        getExpandedRowModel: getExpandedRowModel(),
+        getPaginationRowModel: getPaginationRowModel(),
     });
     
 
     return (
-        <div className="isolate bg-white px-6 py-24 sm:py-32 lg:px-8">
-            <table>
-                <thead>
-                    {table.getHeaderGroups().map(headerGroup => (
-                        <tr key={headerGroup.id}>
-                        {headerGroup.headers.map(header => (
-                            <th key={header.id}>
-                                {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                            </th>
+        <div className="isolate bg-white">
+            <div className="flex justify-between items-center p-3 lg:px-8 bg-gtgold w-full">
+                <h1 className="text-3xl font-semibold text-white">Open Source Projects</h1>
+            </div>
+
+            <div className="table-container max-h-[500px] px-6 lg:px-8 overflow-y-auto">
+                <table className="w-full">
+                    {/* Table headers */}
+                    <thead>
+                        {table.getHeaderGroups().map(headerGroup => (
+                            <tr key={headerGroup.id} className="text-left">
+                                {headerGroup.headers.map(header => (
+                                    <th key={header.id} className="px-4 py-2">
+                                        {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                                    </th>
+                                ))}
+                            </tr>
                         ))}
-                        </tr>
+                    </thead>
+
+                    {/* Table rows */}
+                    <tbody>
+                        {table.getRowModel().rows.map((row, index) => (
+                            <React.Fragment key={row.id}>
+                                <tr className={`px-4 py-2 text-left ${index % 2 === 0 ? 'bg-gray-200' : 'bg-white'} border-b border-gray-400`}>
+                                    {row.getVisibleCells().map(cell => (
+                                        <td key={cell.id} className="px-4 py-2">
+                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                        </td>
+                                    ))}
+                                </tr>
+                                {row.getIsExpanded() && (
+                                    <tr className={`px-4 py-2 ${index % 2 === 0 ? 'bg-gray-200' : 'bg-white'}`}>
+                                        <td colSpan={columns.length}>
+                                            {/* Render your expanded row content here */}
+                                            <div>Abstract: {row.original.projectAbstract}</div>
+                                            <div>Contacts: {row.original.contacts.map(contact => contact.name).join(", ")}</div>
+                                            <div>Project URL: <a href={row.original.projectUrl}>{row.original.projectUrl}</a></div>
+                                            <div>Guidelines URL: <a href={row.original.guidelinesUrl}>{row.original.guidelinesUrl}</a></div>
+                                        </td>
+                                    </tr>
+                                )}
+                            </React.Fragment>
+                        ))}
+
+                        {/* Empty rows if needed */}
+                        {Array.from({ length: 10 - table.getRowModel().rows.length }, (_, index) => (
+                            <tr key={`padding-${index}`} className={`px-4 py-2 ${index % 2 === 0 ? 'bg-gray-200' : 'bg-white'} border-b border-gray-400`}>
+                                <td colSpan={columns.length} className="px-4 py-2">&nbsp;</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+
+            <div className="flex justify-between items-center mt-4">
+                <button onClick={() => table.setPageIndex(0)} disabled={!table.getCanPreviousPage()}>{"<<"}</button>
+                <button onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>{"<"}</button>
+                <button onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>{">"}</button>
+                <button onClick={() => table.setPageIndex(table.getPageCount() - 1)} disabled={!table.getCanNextPage()}>{">>"}</button>
+                <span>
+                    Page{' '}
+                    <strong>
+                        {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+                    </strong>{' '}
+                </span>
+                <span>
+                    | Go to page:{' '}
+                    <input
+                        type="number"
+                        defaultValue={table.getState().pagination.pageIndex + 1}
+                        onChange={e => {
+                            const page = e.target.value ? Number(e.target.value) - 1 : 0;
+                            table.setPageIndex(page);
+                        }}
+                        style={{ width: '100px' }}
+                    />
+                </span>
+                <select
+                    value={table.getState().pagination.pageSize}
+                    onChange={e => {
+                        table.setPageSize(Number(e.target.value));
+                    }}
+                >
+                    {[10, 20, 30, 40, 50].map(pageSize => (
+                        <option key={pageSize} value={pageSize}>
+                            Show {pageSize}
+                        </option>
                     ))}
-                </thead>
-                <tbody>
-                    {table.getRowModel().rows.map(row => (
-                        <tr key={row.id}>
-                            {row.getVisibleCells().map(cell => (
-                                <td key={cell.id}>
-                                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                </td>
-                            ))}
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-            
+                </select>
+            </div>
+
+            {/* Button to add new project */}
             <div className="mt-10">
                 <button 
                     onClick={() => setShowForm(!showForm)}
