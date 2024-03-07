@@ -1,13 +1,31 @@
 import React from "react";
 import { useMemo, useState, useEffect } from "react";
 import ProjectForm from "../ProjectFormPage/ProjectForm";
-import { useReactTable, createColumnHelper, getCoreRowModel, getPaginationRowModel, getExpandedRowModel, flexRender } from '@tanstack/react-table';
+import { 
+    useReactTable,
+    createColumnHelper,
+    getCoreRowModel,
+    getPaginationRowModel,
+    getExpandedRowModel,
+    getFilteredRowModel,
+    flexRender 
+} from '@tanstack/react-table';
 import { Octokit } from "octokit";
 
 // TODO:
-//  - Input HTML for search bar, category checkboxes on side, and database layout
 //  - Add styling
 //  - Move Github API method to separate file
+//  - Fix row display options
+//  - Fix row show display feature to expand more
+
+const checkboxFilter = (row, id, filterValue) => {
+    if (filterValue.length === 0) {
+        return true
+    }
+    
+    const rowFilterValues = row.getValue(id).split(", ")
+    return filterValue.some(filterVal => rowFilterValues.includes(filterVal))
+}
 
 const columnHelper = createColumnHelper();
 const columns = [
@@ -25,12 +43,12 @@ const columns = [
     columnHelper.accessor(row => row.projectAreas.join(", "), {
         id: "projectAreas",
         header: () => "Project Areas",
-        filterFn: "projectAreaFilter",
+        filterFn: checkboxFilter
     }),
     columnHelper.accessor(row => row.licenses.join(", "), {
         id: "licenses",
         header: () => "Licenses",
-        filterFn: "licenseFilter",
+        filterFn: checkboxFilter
     }),
 ];
 
@@ -60,6 +78,7 @@ function ProjectExplorer() {
     });
     const [selectedProjectAreas, setSelectedProjectAreas] = useState([]);
     const [selectedLicenses, setSelectedLicenses] = useState([]);
+    const [columnFilters, setColumnFilters] = useState([]);
 
     // Fetch JSON project data and set allProjects
     useEffect(() => {
@@ -89,13 +108,27 @@ function ProjectExplorer() {
         fetchProjects();
     }, []);
 
+    const handleSearchBarChange = (e) => {
+        const value = e.target.value
+        setColumnFilters(old => [
+            ...old.filter(filter => filter.id !== "projectName"),
+            { id: "projectName", value: value},
+        ]);
+    };
+    
     const handleProjectAreaChange = (e) => {
         const value = e.target.value;
         setSelectedProjectAreas(prev => 
             e.target.checked ? [...prev, value] : prev.filter(v => v !== value)
         );
-        console.log(selectedProjectAreas)
     };
+
+    useEffect(() => {
+        setColumnFilters(old => [
+            ...old.filter(filter => filter.id !== "projectAreas"),
+            { id: "projectAreas", value: selectedProjectAreas }
+        ])
+    }, [selectedProjectAreas]);
     
     // Handler for license checkboxes
     const handleLicenseChange = (e) => {
@@ -105,6 +138,13 @@ function ProjectExplorer() {
         );
     };
 
+    useEffect(() => {
+        setColumnFilters(old => [
+            ...old.filter(filter => filter.id !== "licenses"),
+            { id: "licenses", value: selectedLicenses }
+        ])
+    }, [selectedLicenses]);
+
     const data = useMemo(() => projects, [projects]);
     const table = useReactTable({
         data,
@@ -112,12 +152,14 @@ function ProjectExplorer() {
         state: {
             expanded,
             pagination,
+            columnFilters,
         },
         onExpandedChange: setExpanded,
         onPaginationChange: setPagination,
         getCoreRowModel: getCoreRowModel(),
         getExpandedRowModel: getExpandedRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
+        getFilteredRowModel: getFilteredRowModel(),
     });
 
     return (
@@ -129,6 +171,7 @@ function ProjectExplorer() {
                     type="text"
                     placeholder="Search by name..."
                     className="rounded-md border-0 px-3.5 py-2 text-black shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400"
+                    onChange={handleSearchBarChange}
                 />
             </div>
 
@@ -144,6 +187,7 @@ function ProjectExplorer() {
                                     type="checkbox"
                                     id={option.value}
                                     name={option.value}
+                                    value={option.value}
                                     onChange={handleProjectAreaChange}
                                 />
                                 <label htmlFor={option.value} className="ml-2">{option.label}</label>
@@ -159,7 +203,8 @@ function ProjectExplorer() {
                                     type="checkbox"
                                     id={option.value}
                                     name={option.value}
-                                    onChange={handleProjectAreaChange}
+                                    value={option.value}
+                                    onChange={handleLicenseChange}
                                 />
                                 <label htmlFor={option.value} className="ml-2">{option.label}</label>
                             </div>
