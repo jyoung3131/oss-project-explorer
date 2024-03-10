@@ -122,7 +122,6 @@ function ProjectExplorer() {
             e.target.checked ? [...prev, value] : prev.filter(v => v !== value)
         );
     };
-
     useEffect(() => {
         setColumnFilters(old => [
             ...old.filter(filter => filter.id !== "projectAreas"),
@@ -130,14 +129,12 @@ function ProjectExplorer() {
         ])
     }, [selectedProjectAreas]);
     
-    // Handler for license checkboxes
     const handleLicenseChange = (e) => {
         const value = e.target.value;
         setSelectedLicenses(prev => 
             e.target.checked ? [...prev, value] : prev.filter(v => v !== value)
         );
     };
-
     useEffect(() => {
         setColumnFilters(old => [
             ...old.filter(filter => filter.id !== "licenses"),
@@ -166,29 +163,48 @@ function ProjectExplorer() {
         <div className="isolate bg-white">
             {/* Title Bar */}
             <div className="flex justify-between items-center p-3 lg:px-8 bg-gtgold w-full">
-                <h1 className="text-3xl font-semibold text-white">Open Source Projects</h1>
-                <input
-                    type="text"
-                    placeholder="Search by name..."
-                    className="rounded-md border-0 px-3.5 py-2 text-black shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400"
-                    onChange={handleSearchBarChange}
-                />
+                <h1 className="text-4xl font-semibold text-white">Open Source Projects</h1>
+                <div className="flex w-1/3">
+                    <input
+                        type="text"
+                        placeholder="Search project by name..."
+                        className="w-full rounded-l-md border-0 px-3.5 py-2 text-black shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400"
+                        onChange={handleSearchBarChange}
+                    />
+                    <div className="bg-gtgolddark rounded-r-md px-3 py-2 flex items-center">
+                        <svg
+                            className="w-7 h-7 text-white"
+                            xlmns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                            />
+                        </svg>
+                    </div>
+                </div>
             </div>
 
             <div className="flex">
                 {/* Filter and Button Column */}
-                <div className="flex flex-col p-4 bg-white border-4">
+                <div className="flex-col p-4 bg-whites">
                     {/* Project Area Filter */}
                     <div>
-                        <h2 className="font-semibold">Project Area</h2>
+                        <h2 className="flex text-xl font-semibold pb-3">Project Area</h2>
                         {projectAreaOptions.map(option => (
-                            <div key={option.value}>
+                            <div key={option.value} className="flex items-center mb-2">
                                 <input
                                     type="checkbox"
                                     id={option.value}
                                     name={option.value}
                                     value={option.value}
                                     onChange={handleProjectAreaChange}
+                                    className="w-5 h-5 rounded"
                                 />
                                 <label htmlFor={option.value} className="ml-2">{option.label}</label>
                             </div>
@@ -196,15 +212,16 @@ function ProjectExplorer() {
                     </div>
                     {/* License Filter */}
                     <div>
-                        <h2 className="font-semibold">License</h2>
+                        <h2 className="flex text-xl font-semibold pb-3 pt-5">License</h2>
                         {licenseOptions.map(option => (
-                            <div key={option.value}>
+                            <div key={option.value} className="flex items-center mb-2">
                                 <input
                                     type="checkbox"
                                     id={option.value}
                                     name={option.value}
                                     value={option.value}
                                     onChange={handleLicenseChange}
+                                    className="w-5 h-5 rounded"
                                 />
                                 <label htmlFor={option.value} className="ml-2">{option.label}</label>
                             </div>
@@ -228,7 +245,7 @@ function ProjectExplorer() {
                             {/* Table headers */}
                             <thead>
                                 {table.getHeaderGroups().map(headerGroup => (
-                                    <tr key={headerGroup.id} className="text-left">
+                                    <tr key={headerGroup.id} className="text-left text-lg font-semibold">
                                         {headerGroup.headers.map(header => (
                                             <th key={header.id} className="px-4 py-2">
                                                 {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}

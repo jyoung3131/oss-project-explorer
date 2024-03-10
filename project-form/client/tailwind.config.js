@@ -8,6 +8,7 @@ module.exports = {
       colors: {
         "gtgold": "#a4925a",
         "gtgoldlight": "#bfb37c",
+        "gtgolddark": "#6c6036",
         "gtblack": "#262626",
       }
     },
