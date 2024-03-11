@@ -13,10 +13,7 @@ import {
 import { Octokit } from "octokit";
 
 // TODO:
-//  - Add styling
 //  - Move Github API method to separate file
-//  - Fix row display options
-//  - Fix row show display feature to expand more
 
 const checkboxFilter = (row, id, filterValue) => {
     if (filterValue.length === 0) {
@@ -159,6 +156,34 @@ function ProjectExplorer() {
         getFilteredRowModel: getFilteredRowModel(),
     });
 
+    const getPaginationValues = (page, total) => {
+        if (total <= 7) {
+            if (total === 0) {
+                return [1]
+            }
+
+            return Array.from({length: total}, (_, i) => i+1)
+        }
+        // 1 2 3 4 5 ... 9
+        if (page <= 4) {
+            return [1, 2, 3, 4, 5, 0, total]
+        }
+        // 1 ... 4 5 6 ... 9
+        if (page >= 5 && page < total-3) {
+            return [1, 0, page-1, page, page+1, 0, total]
+        }
+        // 1 ... 5 6 7 8 9
+        if (page >= total-3) {
+            return [1, 0, total-4, total-3, total-2, total-1, total]
+        }
+        
+        return null
+    }
+
+    const debug = (row) => {
+        console.log(row)
+    }
+
     return (
         <div className="isolate bg-white">
             {/* Title Bar */}
@@ -238,16 +263,17 @@ function ProjectExplorer() {
                         </button>
                     </div>
                 </div>
+                {/* Table and Nav Bar */}
                 <div className="flex-grow">
                     {/* Project Table*/}
-                    <div className="table-container max-h-[500px] px-6 lg:px-8 overflow-y-auto">
+                    <div className="table-container px-6 lg:px-8 overflow-y-auto">
                         <table className="w-full">
                             {/* Table headers */}
                             <thead>
                                 {table.getHeaderGroups().map(headerGroup => (
                                     <tr key={headerGroup.id} className="text-left text-lg font-semibold">
                                         {headerGroup.headers.map(header => (
-                                            <th key={header.id} className="px-4 py-2">
+                                            <th key={header.id} className="px-4 py-2 w-52">
                                                 {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                                             </th>
                                         ))}
@@ -270,10 +296,31 @@ function ProjectExplorer() {
                                             <tr className={`px-4 py-2 ${index % 2 === 0 ? 'bg-gray-200' : 'bg-white'}`}>
                                                 <td colSpan={columns.length}>
                                                     {/* Render your expanded row content here */}
-                                                    <div>Abstract: {row.original.projectAbstract}</div>
-                                                    <div>Contacts: {row.original.contacts.map(contact => contact.name).join(", ")}</div>
-                                                    <div>Project URL: <a href={row.original.projectUrl}>{row.original.projectUrl}</a></div>
-                                                    <div>Guidelines URL: <a href={row.original.guidelinesUrl}>{row.original.guidelinesUrl}</a></div>
+                                                    <div className="flex w-full">
+                                                        <div className="w-1/2 border-r border-gray-400 overflow-auto max-h-64">
+                                                            <h3 className="text-center mb-2 font-semibold">Abstract</h3>
+                                                            <p>{row.original.projectAbstract}</p>
+                                                        </div>
+
+                                                        <div className="w-1/4 border-r border-gray-400">
+                                                            <h3 className="text-center mb-2 font-semibold">Primary Contact(s)</h3>
+                                                            <ul>
+                                                                {row.original.contacts.map((contact, index) => {
+                                                                    return (
+                                                                        <li className="mb-2">
+                                                                            {index + 1}. {contact.name} ({contact.email})
+                                                                        </li>
+                                                                    )
+                                                                })}
+                                                            </ul>
+                                                        </div>
+
+                                                        <div className="w-1/4">
+                                                            <h3 className="text-center mb-2 font-semibold">URLs</h3>
+                                                            <p>Project URL: <a href={row.original.projectUrl} className="break-all">{row.original.projectUrl}</a></p>
+                                                            <p>Guidelines URL: <a href={row.original.guidelinesUrl} className="break-all">{row.original.guidelinesUrl}</a></p>
+                                                        </div>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         )}
@@ -281,8 +328,8 @@ function ProjectExplorer() {
                                 ))}
 
                                 {/* Empty rows if needed */}
-                                {Array.from({ length: 10 - table.getRowModel().rows.length }, (_, index) => (
-                                    <tr key={`padding-${index}`} className={`px-4 py-2 ${index % 2 === 0 ? 'bg-gray-200' : 'bg-white'} border-b border-gray-400`}>
+                                {Array.from({ length: pagination.pageSize - table.getRowModel().rows.length }, (_, index) => (
+                                    <tr key={`padding-${index}`} className={`px-4 py-2 ${((table.getRowModel().rows.length + index) % 2) === 0 ? 'bg-gray-200' : 'bg-white'} border-b border-gray-400`}>
                                         <td colSpan={columns.length} className="px-4 py-2">&nbsp;</td>
                                     </tr>
                                 ))}
@@ -290,37 +337,91 @@ function ProjectExplorer() {
                         </table>
                     </div>
 
-                    {/* Page Navigation Bar*/}
-                    <div className="flex justify-between items-center mt-4">
-                        <button onClick={() => table.setPageIndex(0)} disabled={!table.getCanPreviousPage()}>{"<<"}</button>
-                        <button onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>{"<"}</button>
-                        <button onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>{">"}</button>
-                        <button onClick={() => table.setPageIndex(table.getPageCount() - 1)} disabled={!table.getCanNextPage()}>{">>"}</button>
-                        <span>
-                            Page{' '}
-                            <strong>
-                                {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
-                            </strong>{' '}
-                        </span>
-                        <span>
-                            | Go to page:{' '}
+                    {/* Page Navigation Bar */}
+                    <div className="flex items-center justify-center mt-4 mb-4 space-x-4">
+                        <div className="flex items-center">
+                            <button
+                                onClick={() => table.setPageIndex(0)}
+                                disabled={!table.getCanPreviousPage()}
+                                className="px-3 py-2 rounded-l-md bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                            >
+                                &laquo;
+                            </button>
+                            <button
+                                onClick={() => table.previousPage()}
+                                disabled={!table.getCanPreviousPage()}
+                                className="px-3 py-2 bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                            >
+                                &lsaquo;
+                            </button>
+
+                            <div className="flex items-center">
+                                {/* Render page numbers */}
+                                {getPaginationValues(table.getState().pagination.pageIndex+1, table.getPageCount()).map((value, index) => {
+                                    if (value === 0) {
+                                        return (
+                                            <span key={`ellipsis-${index}`} className="px-3 py-2 bg-gray-200">
+                                                ...
+                                            </span>
+                                        );
+                                    }
+
+                                    return (
+                                        <button
+                                            key={value}
+                                            onClick={() => table.setPageIndex(value - 1)}
+                                            className={`px-3 py-2 ${
+                                                table.getState().pagination.pageIndex === value - 1
+                                                    ? 'bg-gtgold text-white'
+                                                    : 'bg-gray-200 hover:bg-gray-300'
+                                            }`}
+                                        >
+                                            {value}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+
+                            <button
+                                onClick={() => table.nextPage()}
+                                disabled={!table.getCanNextPage()}
+                                className="px-3 py-2 bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                            >
+                                &rsaquo;
+                            </button>
+                            <button
+                                onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+                                disabled={!table.getCanNextPage()}
+                                className="px-3 py-2 rounded-r-md bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                            >
+                                &raquo;
+                            </button>
+                        </div>
+
+                        <span className="flex items-center gap-1">
+                            Go to page:
                             <input
                                 type="number"
                                 defaultValue={table.getState().pagination.pageIndex + 1}
+                                min={1}
+                                max={table.getPageCount()}
                                 onChange={e => {
-                                    const page = e.target.value ? Number(e.target.value) - 1 : 0;
+                                    let page = e.target.value ? Number(e.target.value) - 1 : 0;
+                                    page = Math.max(0, Math.min(page, table.getPageCount() - 1));
                                     table.setPageIndex(page);
                                 }}
-                                style={{ width: '100px' }}
+                                className="border p-1 rounded w-16"
                             />
                         </span>
+
                         <select
                             value={table.getState().pagination.pageSize}
-                            onChange={e => {
+                            onChange={(e) => {
                                 table.setPageSize(Number(e.target.value));
                             }}
+                            className="bg-gray-200 rounded-md"
                         >
-                            {[10, 20, 30, 40, 50].map(pageSize => (
+                            {[10, 20, 30, 40, 50].map((pageSize) => (
                                 <option key={pageSize} value={pageSize}>
                                     Show {pageSize}
                                 </option>
@@ -329,8 +430,6 @@ function ProjectExplorer() {
                     </div>
                 </div>
             </div>
-
-            
             
             {showForm && <ProjectForm />}
         </div>
