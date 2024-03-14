@@ -11,10 +11,12 @@ import {
     flexRender 
 } from '@tanstack/react-table';
 import { Octokit } from "octokit";
+import { ChevronRightIcon, ChevronDownIcon } from '@heroicons/react/24/solid';
 
 // TODO:
 //  - Move Github API method to separate file
 
+// Filter method used in Project Area and License columns
 const checkboxFilter = (row, id, filterValue) => {
     if (filterValue.length === 0) {
         return true
@@ -24,17 +26,25 @@ const checkboxFilter = (row, id, filterValue) => {
     return filterValue.some(filterVal => rowFilterValues.includes(filterVal))
 }
 
+// Columns for React Table
 const columnHelper = createColumnHelper();
 const columns = [
     columnHelper.accessor("projectName", {
-        header: "Name",
+        header: () => (
+            <div className="flex justify-start items-center">
+                <div className="opacity-0 h-4 w-7">
+                    <ChevronRightIcon />
+                </div>
+                <span>Name</span>
+            </div>
+        ),
         cell: info => (
-            <>
-                <button onClick={() => info.row.toggleExpanded()}>
-                    {info.row.getIsExpanded() ? '-' : '+'}
+            <div className="flex items-center">
+                <button onClick={() => info.row.toggleExpanded()} className="flex items-center justify-center h-5 w-5">
+                    {info.row.getIsExpanded() ? <ChevronDownIcon className="h-4 w-4" /> : <ChevronRightIcon className="h-4 w-4" />}
                 </button>
-                {info.getValue()}
-            </>
+                <span className="ml-2">{info.getValue()}</span>
+            </div>
         ),
     }),
     columnHelper.accessor(row => row.projectAreas.join(", "), {
@@ -105,6 +115,7 @@ function ProjectExplorer() {
         fetchProjects();
     }, []);
 
+    // Handles input text to search bar
     const handleSearchBarChange = (e) => {
         const value = e.target.value
         setColumnFilters(old => [
@@ -113,6 +124,7 @@ function ProjectExplorer() {
         ]);
     };
     
+    // Handles project area filter boxes interactions
     const handleProjectAreaChange = (e) => {
         const value = e.target.value;
         setSelectedProjectAreas(prev => 
@@ -126,6 +138,7 @@ function ProjectExplorer() {
         ])
     }, [selectedProjectAreas]);
     
+    // Handles project license filter boxes interactions
     const handleLicenseChange = (e) => {
         const value = e.target.value;
         setSelectedLicenses(prev => 
@@ -156,6 +169,7 @@ function ProjectExplorer() {
         getFilteredRowModel: getFilteredRowModel(),
     });
 
+    // Pagination calculator
     const getPaginationValues = (page, total) => {
         if (total <= 7) {
             if (total === 0) {
@@ -180,15 +194,13 @@ function ProjectExplorer() {
         return null
     }
 
-    const debug = (row) => {
-        console.log(row)
-    }
-
     return (
         <div className="isolate bg-white">
             {/* Title Bar */}
             <div className="flex justify-between items-center p-3 lg:px-8 bg-gtgold w-full">
                 <h1 className="text-4xl font-semibold text-white">Open Source Projects</h1>
+
+                {/* Search Bar */}
                 <div className="flex w-1/3">
                     <input
                         type="text"
@@ -235,6 +247,7 @@ function ProjectExplorer() {
                             </div>
                         ))}
                     </div>
+                    
                     {/* License Filter */}
                     <div>
                         <h2 className="flex text-xl font-semibold pb-3 pt-5">License</h2>
@@ -263,6 +276,7 @@ function ProjectExplorer() {
                         </button>
                     </div>
                 </div>
+
                 {/* Table and Nav Bar */}
                 <div className="flex-grow">
                     {/* Project Table*/}
@@ -292,22 +306,21 @@ function ProjectExplorer() {
                                                 </td>
                                             ))}
                                         </tr>
+                                        {/* Expanded row content */}
                                         {row.getIsExpanded() && (
-                                            <tr className={`px-4 py-2 ${index % 2 === 0 ? 'bg-gray-200' : 'bg-white'}`}>
+                                            <tr className={`px-4 py-2 ${index % 2 === 0 ? 'bg-gray-200' : 'bg-white'} border-b border-gray-400`}>
                                                 <td colSpan={columns.length}>
-                                                    {/* Render your expanded row content here */}
                                                     <div className="flex w-full">
-                                                        <div className="w-1/2 border-r border-gray-400 overflow-auto max-h-64">
+                                                        <div className="w-5/12 border-r border-gray-400 overflow-auto max-h-64">
                                                             <h3 className="text-center mb-2 font-semibold">Abstract</h3>
                                                             <p>{row.original.projectAbstract}</p>
                                                         </div>
-
                                                         <div className="w-1/4 border-r border-gray-400">
                                                             <h3 className="text-center mb-2 font-semibold">Primary Contact(s)</h3>
                                                             <ul>
                                                                 {row.original.contacts.map((contact, index) => {
                                                                     return (
-                                                                        <li className="mb-2">
+                                                                        <li className="mb-2 break-all">
                                                                             {index + 1}. {contact.name} ({contact.email})
                                                                         </li>
                                                                     )
@@ -315,10 +328,10 @@ function ProjectExplorer() {
                                                             </ul>
                                                         </div>
 
-                                                        <div className="w-1/4">
+                                                        <div className="w-1/3">
                                                             <h3 className="text-center mb-2 font-semibold">URLs</h3>
-                                                            <p>Project URL: <a href={row.original.projectUrl} className="break-all">{row.original.projectUrl}</a></p>
-                                                            <p>Guidelines URL: <a href={row.original.guidelinesUrl} className="break-all">{row.original.guidelinesUrl}</a></p>
+                                                            <p className="font-medium">Project URL: <a href={row.original.projectUrl} className="font-normal break-all">{row.original.projectUrl}</a></p>
+                                                            <p className="font-medium">Guidelines URL: <a href={row.original.guidelinesUrl} className="font-normal break-all">{row.original.guidelinesUrl}</a></p>
                                                         </div>
                                                     </div>
                                                 </td>
@@ -431,6 +444,7 @@ function ProjectExplorer() {
                 </div>
             </div>
             
+            {/* Section where Project Submission form is rendered */}
             {showForm && <ProjectForm />}
         </div>
     );
