@@ -1,6 +1,8 @@
 import React from "react";
 import { useMemo, useState, useEffect } from "react";
 import ProjectForm from "../ProjectFormPage/ProjectForm";
+import TitleBar from "../TitleBar/TitleBar";
+import Pagination from "../Pagination/Pagination";
 import { 
     useReactTable,
     createColumnHelper,
@@ -8,7 +10,7 @@ import {
     getPaginationRowModel,
     getExpandedRowModel,
     getFilteredRowModel,
-    flexRender 
+    flexRender, 
 } from '@tanstack/react-table';
 import { Octokit } from "octokit";
 import { ChevronRightIcon, ChevronDownIcon } from '@heroicons/react/24/solid';
@@ -196,36 +198,7 @@ function ProjectExplorer() {
 
     return (
         <div className="isolate bg-white">
-            {/* Title Bar */}
-            <div className="flex justify-between items-center p-3 lg:px-8 bg-gtgold w-full">
-                <h1 className="text-4xl font-semibold text-white">Open Source Projects</h1>
-
-                {/* Search Bar */}
-                <div className="flex w-1/3">
-                    <input
-                        type="text"
-                        placeholder="Search project by name..."
-                        className="w-full rounded-l-md border-0 px-3.5 py-2 text-black shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400"
-                        onChange={handleSearchBarChange}
-                    />
-                    <div className="bg-gtgolddark rounded-r-md px-3 py-2 flex items-center">
-                        <svg
-                            className="w-7 h-7 text-white"
-                            xlmns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                        >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                            />
-                        </svg>
-                    </div>
-                </div>
-            </div>
+            <TitleBar onSearchChange={handleSearchBarChange}/>
 
             <div className="flex">
                 {/* Filter and Button Column */}
@@ -350,97 +323,18 @@ function ProjectExplorer() {
                         </table>
                     </div>
 
-                    {/* Page Navigation Bar */}
-                    <div className="flex items-center justify-center mt-4 mb-4 space-x-4">
-                        <div className="flex items-center">
-                            <button
-                                onClick={() => table.setPageIndex(0)}
-                                disabled={!table.getCanPreviousPage()}
-                                className="px-3 py-2 rounded-l-md bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100 disabled:cursor-not-allowed"
-                            >
-                                &laquo;
-                            </button>
-                            <button
-                                onClick={() => table.previousPage()}
-                                disabled={!table.getCanPreviousPage()}
-                                className="px-3 py-2 bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100 disabled:cursor-not-allowed"
-                            >
-                                &lsaquo;
-                            </button>
-
-                            <div className="flex items-center">
-                                {/* Render page numbers */}
-                                {getPaginationValues(table.getState().pagination.pageIndex+1, table.getPageCount()).map((value, index) => {
-                                    if (value === 0) {
-                                        return (
-                                            <span key={`ellipsis-${index}`} className="px-3 py-2 bg-gray-200">
-                                                ...
-                                            </span>
-                                        );
-                                    }
-
-                                    return (
-                                        <button
-                                            key={value}
-                                            onClick={() => table.setPageIndex(value - 1)}
-                                            className={`px-3 py-2 ${
-                                                table.getState().pagination.pageIndex === value - 1
-                                                    ? 'bg-gtgold text-white'
-                                                    : 'bg-gray-200 hover:bg-gray-300'
-                                            }`}
-                                        >
-                                            {value}
-                                        </button>
-                                    );
-                                })}
-                            </div>
-
-                            <button
-                                onClick={() => table.nextPage()}
-                                disabled={!table.getCanNextPage()}
-                                className="px-3 py-2 bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100 disabled:cursor-not-allowed"
-                            >
-                                &rsaquo;
-                            </button>
-                            <button
-                                onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-                                disabled={!table.getCanNextPage()}
-                                className="px-3 py-2 rounded-r-md bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100 disabled:cursor-not-allowed"
-                            >
-                                &raquo;
-                            </button>
-                        </div>
-
-                        <span className="flex items-center gap-1">
-                            Go to page:
-                            <input
-                                type="number"
-                                defaultValue={table.getState().pagination.pageIndex + 1}
-                                min={1}
-                                max={table.getPageCount()}
-                                onChange={e => {
-                                    let page = e.target.value ? Number(e.target.value) - 1 : 0;
-                                    page = Math.max(0, Math.min(page, table.getPageCount() - 1));
-                                    table.setPageIndex(page);
-                                }}
-                                className="border p-1 rounded w-16"
-                            />
-                        </span>
-
-                        <select
-                            value={table.getState().pagination.pageSize}
-                            onChange={(e) => {
-                                table.setPageSize(Number(e.target.value));
-                            }}
-                            className="bg-gray-200 rounded-md"
-                        >
-                            {[10, 20, 30, 40, 50].map((pageSize) => (
-                                <option key={pageSize} value={pageSize}>
-                                    Show {pageSize}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
+                    <Pagination
+                        pageIndex={table.getState().pagination.pageIndex}
+                        pageCount={table.getPageCount()}
+                        pageSize={table.getState().pagination.pageSize}
+                        onChangePageSize={(pageSize) => table.setPageSize(pageSize)}
+                        onChangeFirstPage={() => table.setPageIndex(0)}
+                        onChangeNextPage={() => table.nextPage()}
+                        onChangePreviousPage={() => table.previousPage()}
+                        onChangePageIndex={(pageIndex) => table.setPageIndex(pageIndex)}
+                        canNextPage={table.getCanNextPage()}
+                        canPreviousPage={table.getCanPreviousPage()}
+                    />
                 </div>
             </div>
             
