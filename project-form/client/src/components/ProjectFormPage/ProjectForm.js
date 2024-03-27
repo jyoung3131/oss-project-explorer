@@ -2,6 +2,8 @@ import { useState } from "react";
 import isUrl from "is-url";
 import Select from 'react-select';
 import { Octokit } from "octokit";
+import projectAreaOptions from "../../data/projectAreaOptions";
+import licenseOptions from "../../data/licenseOptions";
 
 function ProjectForm() {
   const [formData, setFormData] = useState({
@@ -13,22 +15,6 @@ function ProjectForm() {
     projectUrl: '',
     guidelinesUrl: ''
   });
-  
-  const projectAreaOptions = [
-    { value: 'ai', label: 'Artifical Intelligence' },
-    { value: 'bioscience', label: 'Bioscience' },
-    { value: 'compsci', label: 'Computer Science' },
-    { value: 'hpc', label: 'High Performance Computing' },
-    { value: 'graphics', label: 'Computer Graphics' },
-    { value: 'robotics', label: 'Robotics' },
-    { value: 'hci', label: 'Human-Computer Interaction' }
-  ];
-  const licenseOptions = [
-    { value: 'mit', label: 'MIT License' },
-    { value: 'apache', label: 'Apache License 2.0' },
-    { value: 'isc', label: 'ISC License' },
-    { value: 'bsd-3', label: 'BSD 3-Clause "New" or "Revised" License' },
-  ];
 
   const [errors, setErrors] = useState({});
 
