@@ -82,7 +82,7 @@ const ProjectTable = ({ columnFilters }) => {
 
     return (
         <div>
-            <div className="table-container px-6 lg:px-8 overflow-y-auto">
+            <div className="px-6 lg:px-8 max-h-[500px] overflow-y-auto">
                 <table className="w-full">
                     {/* Table headers */}
                     <thead>
