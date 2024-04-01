@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useState, forwardRef } from "react";
 import isUrl from "is-url";
 import Select from 'react-select';
 import { Octokit } from "octokit";
 import projectAreaOptions from "../../data/projectAreaOptions";
 import licenseOptions from "../../data/licenseOptions";
 
-function ProjectForm() {
+const ProjectForm = forwardRef((props, ref) => {
   const [formData, setFormData] = useState({
     projectName: '',
     projectAbstract: '',
@@ -102,13 +102,13 @@ function ProjectForm() {
       setIsSubmitting(true)
 
       const octokit = new Octokit({
-        auth: "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"
+        auth: "" /* INSERT TOKEN HERE */,
       })
 
       // Get File SHA and contents
       const response1 = await octokit.request("GET /repos/{owner}/{repo}/contents/{path}?ref=json-form-test", {
         owner: "gt-ospo",
-        repo: "open-source-project-explorer",
+        repo: "oss-project-explorer-data",
         path: "project_list.json"
       })
 
@@ -148,7 +148,7 @@ function ProjectForm() {
           })
         }
 
-        setSuccessMessage("Project submitted successfully!");
+        setSuccessMessage("Thank you for submitting your project. Your submission will be reviewed via Github PR, and we will notify you once your project is approved to be added.");
       } catch (error) {
         console.log(error)
         setSuccessMessage("Something went wrong...please try again.");
@@ -161,7 +161,7 @@ function ProjectForm() {
   };
 
   return (
-    <div className="isolate bg-white px-6 py-24 sm:py-32 lg:px-8">
+    <div ref={ref} className="isolate bg-white px-6 py-12 sm:py-12 lg:px-8">
 
       <div className="mx-auto max-w-2xl text-center">
         <h2 className="text-3xl font-bold font-roboto tracking-tight text-gtblack sm:text-4xl">Open Source Project Information Form</h2>
@@ -377,6 +377,6 @@ function ProjectForm() {
       </form>
     </div>
   );
-}
+});
 
 export default ProjectForm;
