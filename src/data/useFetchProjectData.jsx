@@ -6,14 +6,14 @@ const useFetchProjectData = () => {
 
     useEffect(() => {
         const octokit = new Octokit({
-            auth: "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"
+            auth: "" /* INSERT TOKEN HERE */,
         })
 
         async function fetchProjects() {
             try {
                 const response = await octokit.request("GET /repos/{owner}/{repo}/contents/{path}?ref={branch}", {
                     owner: "gt-ospo",
-                    repo: "open-source-project-explorer",
+                    repo: "oss-project-explorer-data",
                     path: "project_list.json",
                     branch: "json-form-test"
                 })
