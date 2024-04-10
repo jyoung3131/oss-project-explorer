@@ -6,7 +6,7 @@ const useFetchProjectData = () => {
 
     useEffect(() => {
         const octokit = new Octokit({
-            auth: "" /* INSERT TOKEN HERE */,
+            auth: "",
         })
 
         async function fetchProjects() {
