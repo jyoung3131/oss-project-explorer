@@ -5,13 +5,14 @@ import ProjectExplorer from './components/ProjectExplorerPage/ProjectExplorer';
 
 function App() {
   return (
-    <div className="App">
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<ProjectExplorer />}/>
-        </Routes>
-      </BrowserRouter>
-    </div>
+    // <div className="App">
+    //   <BrowserRouter>
+    //     <Routes>
+    //       <Route path="/" element={<ProjectExplorer />}/>
+    //     </Routes>
+    //   </BrowserRouter>
+    // </div>
+    <ProjectExplorer/>
   );
 }
 

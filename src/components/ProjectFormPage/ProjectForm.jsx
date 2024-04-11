@@ -102,7 +102,7 @@ const ProjectForm = forwardRef((props, ref) => {
       setIsSubmitting(true)
 
       const octokit = new Octokit({
-        auth: "" /* INSERT TOKEN HERE */,
+        auth: "",
       })
 
       // Get File SHA and contents
