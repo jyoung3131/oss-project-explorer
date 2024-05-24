@@ -102,7 +102,7 @@ const ProjectForm = forwardRef((props, ref) => {
       setIsSubmitting(true)
 
       const octokit = new Octokit({
-        auth: "",
+        auth: "OSPO_EXPLORER_PAT",
       })
 
       // Get File SHA and contents
