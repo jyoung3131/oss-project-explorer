@@ -135,7 +135,7 @@ const ProjectForm = forwardRef((props, ref) => {
             message: "Inserted new project to project list file",
             content: fileContent,
             sha: sha,
-            branch: "json-form-test"
+            branch: "new-form-submission"
           })
         } else {
           await octokit.request("PUT /repos/{owner}/{repo}/contents/{path}", {
@@ -144,7 +144,7 @@ const ProjectForm = forwardRef((props, ref) => {
             path: "project_list.json",
             message: "Created project list file and added new project",
             content: fileContent,
-            branch: "json-form-test"
+            branch: "new-form-submission"
           })
         }
 
