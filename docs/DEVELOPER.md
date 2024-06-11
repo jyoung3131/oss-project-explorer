@@ -77,9 +77,11 @@ TBD
 
 ## 6. Deployment
 
-The deployment process consists of a GitHub Action that builds and deploys the web UI to GitHub pages.
+The deployment process consists of a GitHub Action that builds and deploys the web UI to GitHub pages when a push to main is confirmed. This action should only be triggered when a pull request is merged into the main branch. 
 
-You will need to have all of the values defined in the .creds file for local deployment defined as GitHub secrets on your repo for this workflow to succeed. You can find the secrets configuration at the following URL: https://github.com/<your org or user>/<your repo>/settings/secrets/actions or on the Settings tab:
+An early version of this code used the [Public-Action-Trigger](https://github.com/apps/public-action-trigger) GitHub application to trigger a pull request for any submitted updates to the OSS Explorer form UI. 
+
+You will need to have all of the values defined in the .creds file for local deployment defined as GitHub secrets on your repo for this workflow to succeed. You can find the secrets configuration at the following URL: https://github.com/<your org or user>/<your repo>/settings/secrets/actions or on the Settings tab.
 
 ## 7. Maintenance
 
