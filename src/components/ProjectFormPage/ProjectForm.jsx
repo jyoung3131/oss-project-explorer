@@ -102,16 +102,16 @@ const ProjectForm = forwardRef((props, ref) => {
       setIsSubmitting(true)
 
       const octokit = new Octokit({
-        auth: "OSPO_EXPLORER_PAT",
+        auth: "OSPO_EXPLORER_TOKEN",
       })
 
       // Get File SHA and contents
-      const response1 = await octokit.request("GET /repos/{owner}/{repo}/contents/{path}?ref=json-form-test", {
+      const response1 = await octokit.request("GET /repos/{owner}/{repo}/contents/{path}?ref=new-form-submission", {
         owner: "gt-ospo",
-        repo: "oss-project-explorer-data",
-        path: "project_list.json"
+        repo: "oss-project-explorer",
+        path: "src/data/project_list.json"
       })
-
+      
       let sha = null
       var fileContent = []
 
@@ -130,8 +130,8 @@ const ProjectForm = forwardRef((props, ref) => {
         if (response1.status === 200) {
           await octokit.request("PUT /repos/{owner}/{repo}/contents/{path}", {
             owner: "gt-ospo",
-            repo: "open-source-project-explorer",
-            path: "project_list.json",
+            repo: "oss-project-explorer",
+            path: "src/data/project_list.json",
             message: "Inserted new project to project list file",
             content: fileContent,
             sha: sha,
@@ -141,7 +141,7 @@ const ProjectForm = forwardRef((props, ref) => {
           await octokit.request("PUT /repos/{owner}/{repo}/contents/{path}", {
             owner: "gt-ospo",
             repo: "open-source-project-explorer",
-            path: "project_list.json",
+            path: "src/data/project_list.json",
             message: "Created project list file and added new project",
             content: fileContent,
             branch: "new-form-submission"
