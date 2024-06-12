@@ -24,7 +24,7 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     env:
-      OSPO_EXPLORER_PAT: ${{ secrets.OSPO_EXPLORER_TOKEN }}
+      OSPO_EXPLORER_TOKEN: ${{ secrets.OSPO_EXPLORER_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -36,7 +36,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Replace PAT
-        run: sed -i "s/OSPO_EXPLORER_TOKEN/$OSPO_EXPLORER_PAT/g" src/components/ProjectFormPage/ProjectForm.jsx
+        run: sed -i "s/OSPO_EXPLORER_TOKEN/$OSPO_EXPLORER_TOKEN/g" src/components/ProjectFormPage/ProjectForm.jsx
       - name: Build
         run: npm run build
       - name: Setup Pages
