@@ -12,6 +12,7 @@ import {
     flexRender, 
 } from '@tanstack/react-table';
 import { ChevronRightIcon, ChevronDownIcon } from '@heroicons/react/24/solid';
+import data from '../../data/project_list.json';
 
 const ProjectTable = ({ columnFilters, showForm, onShowForm }) => {
     const [expanded, setExpanded] = useState({});
@@ -63,7 +64,7 @@ const ProjectTable = ({ columnFilters, showForm, onShowForm }) => {
         }),
     ];
 
-    const data = useFetchProjectData();
+    // const data = temp;
     const table = useReactTable({
         data,
         columns,
