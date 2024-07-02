@@ -137,14 +137,17 @@ const ProjectForm = forwardRef((props, ref) => {
             sha: sha,
             branch: "new-form-submission"
           })
-        } else {
-          await octokit.request("PUT /repos/{owner}/{repo}/contents/{path}", {
-            owner: "gt-ospo",
-            repo: "open-source-project-explorer",
-            path: "src/data/project_list.json",
-            message: "Created project list file and added new project",
-            content: fileContent,
-            branch: "new-form-submission"
+
+          await octokit.request('POST /repos/{owner}/{repo}/pulls', {
+            owner: 'gt-ospo',
+            repo: 'oss-project-explorer',
+            title: 'Project List Update',
+            body: 'added new project to list',
+            head: 'gt-ospo-bot:new-form-submission',
+            base: 'main',
+            headers: {
+              'X-GitHub-Api-Version': '2022-11-28'
+            }
           })
         }
 
