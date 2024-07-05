@@ -103,57 +103,85 @@ const ProjectForm = forwardRef((props, ref) => {
 
       const octokit = new Octokit({
         auth: "OSPO_EXPLORER_TOKEN",
-      })
+      });
 
-      // Get File SHA and contents
-      const response1 = await octokit.request("GET /repos/{owner}/{repo}/contents/{path}?ref=new-form-submission", {
+      // get main branch SHA
+      const main_branch_response = await octokit.request('GET /repos/{owner}/{repo}/git/refs/heads/main', {
+        owner: "gt-ospo",
+        repo: "oss-project-explorer"
+      });
+
+      console.debug('GET main', main_branch_response);
+      
+      let main_branch_sha = null;
+      if (main_branch_response.status === 200) {
+        main_branch_sha = main_branch_response.data.object.sha;
+      }
+
+      const new_branch = crypto.randomUUID();
+
+      // create new branch
+      const change_branch_response = await octokit.request('POST /repos/{owner}/{repo}/git/refs', {
         owner: "gt-ospo",
         repo: "oss-project-explorer",
-        path: "src/data/project_list.json"
-      })
-      
-      let sha = null
-      var fileContent = []
+        ref: 'refs/heads/' + new_branch,
+        sha: main_branch_sha
+      });
+      console.debug('POST branch', change_branch_response);
 
-      if (response1.status === 200) {
-        sha = response1.data["sha"]
-        fileContent = JSON.parse(atob(response1.data.content))
+      // get sha of file
+      const file_sha_response = await octokit.request('GET /repos/{owner}/{repo}/contents/{path}?ref={branch}', {
+        owner: "gt-ospo",
+        repo: "oss-project-explorer",
+        path: 'src/data/project_list.json',
+        branch: new_branch
+      });
+      console.debug('GET file', file_sha_response);
+
+      let fileContent = [];
+      let file_sha;
+
+      if (file_sha_response.status === 200) {
+        file_sha = file_sha_response.data.sha;
+        fileContent = JSON.parse(atob(file_sha_response.data.content));
       }
 
       // Turn new file contents to base 64 encoding
-      fileContent.push(formData)
-      fileContent = JSON.stringify(fileContent, null, 2)
-      fileContent = btoa(fileContent)
+      fileContent.push(formData);
+      fileContent = JSON.stringify(fileContent, null, 2);
+      fileContent = btoa(fileContent);
 
-      // Update or create new file in repo
+      // post file content
+        if (file_sha_response.status === 200) {
       try {
-        if (response1.status === 200) {
-          await octokit.request("PUT /repos/{owner}/{repo}/contents/{path}", {
+          let content_response = await octokit.request("PUT /repos/{owner}/{repo}/contents/{path}", {
             owner: "gt-ospo",
             repo: "oss-project-explorer",
             path: "src/data/project_list.json",
             message: "Inserted new project to project list file",
             content: fileContent,
-            sha: sha,
-            branch: "new-form-submission"
-          })
-
-          await octokit.request('POST /repos/{owner}/{repo}/pulls', {
+            sha: file_sha,
+            branch: new_branch
+          });
+          console.debug('PUT file', content_response);
+      
+        // create pull request
+          let pull_response = await octokit.request('POST /repos/{owner}/{repo}/pulls', {
             owner: 'gt-ospo',
             repo: 'oss-project-explorer',
             title: 'Project List Update',
             body: 'added new project to list',
-            head: 'gt-ospo-bot:new-form-submission',
-            base: 'main',
-            headers: {
-              'X-GitHub-Api-Version': '2022-11-28'
-            }
-          })
-        }
-
+            // head: 'gt-ospo-bot:' + new_branch,
+            head: new_branch,
+            base: 'main'
+          });
+          console.debug('POST pull', pull_response);
+        
         setSuccessMessage("Thank you for submitting your project. Your submission will be reviewed via Github PR, and we will notify you once your project is approved to be added.");
       } catch (error) {
-        console.log(error)
+        console.debug('HTTP Error status:', error.status);
+        console.debug('HTTP Error request:', error.request);
+        console.debug('HTTP Error response:', error.response);
         setSuccessMessage("Something went wrong...please try again.");
       } finally {
         setIsSubmitting(false)
@@ -161,6 +189,7 @@ const ProjectForm = forwardRef((props, ref) => {
     } else {
       setSuccessMessage("");
     }
+  }
   };
 
   return (
