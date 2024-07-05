@@ -1,1 +1,20 @@
-[]
+[
+  {
+    "projectName": "Spatter",
+    "projectAbstract": "Spatter is a benchmark",
+    "projectAreas": [
+      "HPC"
+    ],
+    "licenses": [
+      "MIT"
+    ],
+    "contacts": [
+      {
+        "name": "Jeff Young",
+        "email": "jyoung9@gatech.edu"
+      }
+    ],
+    "projectUrl": "https://github.com/hpcgarage/spatter/",
+    "guidelinesUrl": "https://github.com/hpcgarage/spatter/"
+  }
+]
