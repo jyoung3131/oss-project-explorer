@@ -5,7 +5,7 @@ const ProjectAreaFilter = ({ onProjectAreaFilterChange }) => {
     return (
         <div>
             <h2 className="flex text-xl font-semibold pb-3">Project Area</h2>
-            {projectAreaOptions.map(option => (
+            {projectAreaOptions.slice(0,-1).map(option => (
                 <div key={option.value} className="flex items-center mb-2">
                     <input
                         type="checkbox"

@@ -220,7 +220,7 @@ const ProjectForm = forwardRef((props, ref) => {
                 placeholder="Enter the project's name"
               />
             </div>
-            {errors.projectName && <div className="text-sm text-red-500">{errors.projectName}</div>}
+            {errors.projectName && <div className="text-xs text-red-500">{errors.projectName}</div>}
 
           </div>
 
@@ -241,7 +241,7 @@ const ProjectForm = forwardRef((props, ref) => {
                 placeholder="Enter an abstract on the project"
               />
             </div>
-            {errors.projectAbstract && <div className="text-sm text-red-500">{errors.projectAbstract}</div>}
+            {errors.projectAbstract && <div className="text-xs text-red-500">{errors.projectAbstract}</div>}
           </div>
 
 
@@ -258,7 +258,18 @@ const ProjectForm = forwardRef((props, ref) => {
               classNamePrefix="select"
               onChange={(selectedOptions) => handleSelectChange('projectAreas', selectedOptions)} 
             />
-            {errors.projectAreas && <div className="text-sm text-red-500">{errors.projectAreas}</div>}
+
+            {errors.projectAreas && <div className="text-xs text-red-500">{errors.projectAreas}</div>}
+
+            <div className="mt-2 text-xs text-gray-500">
+              <p>Don't see a suitable project area? Select <span className="font-semibold">"Other"</span> and submit the form.</p>
+              <p>Submit a request by filling out a <a 
+                href="https://github.com/gt-ospo/oss-project-explorer/issues/new?template=00-project-area-request"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:text-blue-800"
+              >GitHub issue</a>, and we'll review it and update your form if needed.</p>
+            </div>
           </div>
 
 
@@ -275,7 +286,7 @@ const ProjectForm = forwardRef((props, ref) => {
               classNamePrefix="select"
               onChange={(selectedOptions) => handleSelectChange('licenses', selectedOptions)} 
             />
-            {errors.licenses && <div className="text-sm text-red-500">{errors.licenses}</div>}
+            {errors.licenses && <div className="text-xs text-red-500">{errors.licenses}</div>}
           </div>
 
 
@@ -311,7 +322,7 @@ const ProjectForm = forwardRef((props, ref) => {
                     onChange={(e) => handleContactChange(index, e)} 
                     placeholder="Enter the contact's full name"
                   />
-                  {errors.contacts && errors.contacts[index] && errors.contacts[index].name && <div className="mt-1 text-sm text-red-500">{errors.contacts[index].name}</div>}
+                  {errors.contacts && errors.contacts[index] && errors.contacts[index].name && <div className="mt-1 text-xs text-red-500">{errors.contacts[index].name}</div>}
                 </div>
 
                 <div>
@@ -323,7 +334,7 @@ const ProjectForm = forwardRef((props, ref) => {
                     onChange={(e) => handleContactChange(index, e)} 
                     placeholder="Enter the contact's email"
                   />
-                  {errors.contacts && errors.contacts[index] && errors.contacts[index].email && <div className="mt-1 text-sm text-red-500">{errors.contacts[index].email}</div>}
+                  {errors.contacts && errors.contacts[index] && errors.contacts[index].email && <div className="mt-1 text-xs text-red-500">{errors.contacts[index].email}</div>}
                 </div>
 
               </div>
@@ -363,7 +374,7 @@ const ProjectForm = forwardRef((props, ref) => {
                 placeholder="Enter a valid URL to the project page"
               />
             </div>
-            {errors.projectUrl && <div className="text-sm text-red-500">{errors.projectUrl}</div>}
+            {errors.projectUrl && <div className="text-xs text-red-500">{errors.projectUrl}</div>}
           </div>
 
 
@@ -383,7 +394,7 @@ const ProjectForm = forwardRef((props, ref) => {
                 placeholder="Enter a valid URL to the community contribution guidelines page URL"
               />
             </div>
-            {errors.guidelinesUrl && <div className="text-sm text-red-500">{errors.guidelinesUrl}</div>}
+            {errors.guidelinesUrl && <div className="text-xs text-red-500">{errors.guidelinesUrl}</div>}
           </div>
 
 
