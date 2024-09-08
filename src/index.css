@@ -3,3 +3,26 @@
 @import "tailwindcss/components";
 
 @import "tailwindcss/utilities";
+
+@layer components {
+    .scrollbar::-webkit-scrollbar {
+      width: 8px;
+      height: 15px;
+    }
+  
+    .scrollbar::-webkit-scrollbar-track {
+      border-radius: 100vh;
+      background: #eeeeee;
+    }
+  
+    .scrollbar::-webkit-scrollbar-thumb {
+      background: #cccccc;
+      border-radius: 100vh;
+      border: 3px solid #cccccc;
+    }
+  
+    .scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #bbbbbb;
+      border: 3px solid #bbbbbb;
+    }
+}
