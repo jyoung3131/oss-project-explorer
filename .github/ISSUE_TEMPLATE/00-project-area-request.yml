@@ -1,0 +1,31 @@
+name: ✨ New Project Area Request
+description: Create a new issue for a new project area.
+title: ✨ [Project Area REQUEST] - <title>
+labels: [project area]
+body:
+- type: markdown
+  attributes:
+    value: |
+      ## OSPO Explorer New Project Area Request
+      ✨ Welcome to the OSPO Explorer Project Area Request Form. Fill out the below items with as much detail as possible & don't forget to include a title!
+      Please do **not** use this form for Bug Reports.
+
+      If we approve this request, we will change the project area in your form to the new area.
+
+      If we reject this request, we kindly ask that you resubmit your form picking one of the available project areas.
+- type: textarea
+  id: project_name
+  attributes:
+    label: 📝 Project Name
+    description: Please enter the name of your project
+    placeholder: Enter the project name
+  validations:
+    required: true
+- type: textarea
+  id: project_area
+  attributes:
+    label: 📝 Project Area
+    description: Please enter the project area you'd like to add
+    placeholder: Enter the project area
+  validations:
+    required: true
