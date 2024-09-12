@@ -3,7 +3,14 @@ import React from "react";
 const TitleBar = ({ onSearchChange }) => {
     return (
         <div className="flex justify-between items-center p-3 lg:px-8 bg-gtgold w-full">
-            <h1 className="text-4xl font-semibold text-white">Open Source Projects</h1>
+            <div className="flex items-center">
+                <img
+                    src={'gt-logo.png'} // Reference the logo from the public folder
+                    alt="Georgia Tech Logo"
+                    className="h-11 mr-4" // Adjust size and spacing as needed
+                />
+                <h1 className="text-3xl font-semibold text-white">Open Source Projects</h1>
+            </div>
 
             {/* Search Bar */}
             <div className="flex w-1/3">
