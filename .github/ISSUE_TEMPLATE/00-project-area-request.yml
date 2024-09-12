@@ -8,11 +8,11 @@ body:
     value: |
       ## OSPO Explorer New Project Area Request
       ✨ Welcome to the OSPO Explorer Project Area Request Form. Fill out the below items with as much detail as possible & don't forget to include a title!
+      
+      - If we **approve** this request, we will change the project area in your form to the new area.
+      - If we **reject** this request, we kindly ask that you resubmit your form picking one of the available project areas.
+
       Please do **not** use this form for Bug Reports.
-
-      If we approve this request, we will change the project area in your form to the new area.
-
-      If we reject this request, we kindly ask that you resubmit your form picking one of the available project areas.
 - type: textarea
   id: project_name
   attributes:
