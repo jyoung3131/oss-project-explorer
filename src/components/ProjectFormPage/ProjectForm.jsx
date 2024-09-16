@@ -264,7 +264,7 @@ const ProjectForm = forwardRef((props, ref) => {
             <div className="mt-2 text-xs text-gray-500">
               <p>Don't see a suitable project area? Select <span className="font-semibold">"Other"</span> and submit the form.</p>
               <p>Submit a request by filling out a <a 
-                href="https://github.com/gt-ospo/oss-project-explorer/issues/new?template=00-project-area-request"
+                href="https://github.com/gt-ospo/oss-project-explorer/issues/new?assignees=&labels=&template=00-project-area-request.yml&title=%E2%9C%A8+%5BPROJECT+AREA+REQUEST%5D+-+%3Cinsert+project+area+here%3E"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-600 hover:text-blue-800"
