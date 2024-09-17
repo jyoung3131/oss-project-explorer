@@ -41,7 +41,7 @@ The `components` folder contains the React components used to build the user int
 - **Pagination**: Manages the pagination of the project table.
 - **ProjectAreaFilter**: Filters projects by their area of research or focus.
 - **ProjectExplorerPage**: The main page where users explore available projects.
-- **ProjectFormPage**: Contains the form for users to submit new projects. This is where calls to the Github API using Octokit occur after a user clicks submit.
+- **ProjectFormPage**: Contains the form for users to submit new projects. This is where calls to the Github API using Octokit occur after a user clicks submit. This is also where users are directed to creating a Github Issue if they'd like to request a new project area.
 - **ProjectTable**: Displays the list of projects in a table format, allowing for sorting and filtering. Retrieves project data from `project_list.json` in the `src/data` folder.
 - **TitleBar**: Displays the title and search bar.
 
@@ -63,9 +63,14 @@ The `data` folder contains files that manage the project's data and options.
 - **reportWebVitals.js**: Used for measuring and reporting performance metrics of the app.
 - **setupTests.js**: Configures the testing environment and setups before running tests.
 
-### 3.2 `.github/workflows` Folder
+### 3.2 `.github` Folder
+
+#### 3.2.1 `.github/workflows` Folder
 The `.github/workflows` folder contains the Github Actions yaml files.
-- **pages-deploy.yml.jsx**: Triggered on pushes to the `main` branch. Builds and deploys application to Github Pages, and replaces the placeholder token in `ProjectForm.jsx` with the Github secret `OSPO_EXPLORER_TOKEN`.
+- **pages-deploy.yml**: Triggered on pushes to the `main` branch. Builds and deploys application to Github Pages, and replaces the placeholder token in `ProjectForm.jsx` with the Github secret `OSPO_EXPLORER_TOKEN`.
+
+#### 3.2.2 `./github/ISSUE_TEMPLATE`
+- **00-project-area-request.yml**: The issue template file used so that users can submit a request to add a new project area.
 
 ### 3.3 `public` Folder
 The static assets live in this folder. The boilerplate files such as favicon.ico and robots.txt live here. No relevant files are in this folder
@@ -103,12 +108,15 @@ During this deployment, it replaces the string `"OSPO_EXPLORER_TOKEN"` in `Proje
 ### 6.1. Reviewing New Project Submissions
 When users submit new project forms, a pull request is made from a separate branch created by the gt-ospo-bot. This branch has the new project information added to the `project_list.json` file. Administrators of this repository will have to manually review each pull request and merge in ones that have a valid project form.
 
-### 6.2. Updating Dependencies
+### 6.2 Reviewing New Project Area Issues
+When users submit an issue to add a new project area, we must review them manually. If we approve, we must go to their PR make for their project submission, merge the PR and adjust the project area field in their project to include their new area.
+
+### 6.3. Updating Dependencies
 GitHub's Dependabot is enabled for the repository which will create PRs for critical dependency updates. 
 
 To manually maintain the React dependencies, run the `npm outdated` command to see a list of dependencies that need attention. The concerning ones will be presented in red type. From here upgrading dependencies can be done using `npm upgrade <package name>`.
 
-### 6.3. Troubleshooting
+### 6.4. Troubleshooting
 To diagnose if an issue is UI related, load the application in a browser with the dev tools open.
 
 You can see JavaScript errors in the Console tab of the dev tools.
