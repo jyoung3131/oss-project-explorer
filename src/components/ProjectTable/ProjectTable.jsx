@@ -1,7 +1,6 @@
 import React from "react";
 import { useState } from "react";
 import Pagination from "../Pagination/Pagination";
-import useFetchProjectData from "../../data/useFetchProjectData";
 import { 
     useReactTable,
     createColumnHelper,
